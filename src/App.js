@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
 import Home from './panels/Home';
 import Place from './panels/Place';
@@ -148,12 +148,30 @@ const App = () => {
 						}}
 					/>
 				</Route>
-				<Route path="/basket/:areaId/:itemId" exact>
-					<Basket
-						foodAreas={FOOD_AREAS}
-						order={order}
-					/>
-				</Route>
+				<Route
+				  exact
+				  path="/basket/:areaId/:itemId"
+				  render={(routeProps) => {
+					const place = routeProps.match.params.itemId;
+					const placeFood = FOOD_AREAS[0].items.find(item => item.id === place);
+					const placeFoodValues = placeFood
+						? placeFood.foods.map(food => food.id)
+						: []
+
+					const isOrderPossible = Object.values(order).some(orderItem => {
+						return placeFoodValues.includes(orderItem.item.id)
+					});
+
+					return isOrderPossible ? (
+						<Basket
+							foodAreas={FOOD_AREAS}
+							order={order}
+						/>
+					) : (
+						<Redirect to="/" />
+					)
+					}}
+				/>
 				<Route
 					path="/orders"
 					exact

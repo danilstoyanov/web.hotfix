@@ -8,6 +8,14 @@ import './place.css';
 
 
 const Place = ({ item, order, onIncrementPosition, onDecrementPosition, area }) => {
+  const placeFoodIds = useMemo(() => {
+    if(Object.values(item).length === 0) {
+      return []
+    }
+
+    return item.foods.map(item => item.id)
+  }, [item]);
+
   const price = useMemo(() => {
     const foodIds = new Set((item.foods || []).map(item => item.id));
 
@@ -25,6 +33,9 @@ const Place = ({ item, order, onIncrementPosition, onDecrementPosition, area }) 
 
     return accounting.formatNumber(result, 0, ' ');
   }, [ order, item ]);
+
+  const orderValues = Object.values(order);
+  const isOrderPossible = orderValues.length > 0 && orderValues.some(orderItem => placeFoodIds.includes(orderItem.item.id))
 
   return (
     <div className="Place">
@@ -101,9 +112,19 @@ const Place = ({ item, order, onIncrementPosition, onDecrementPosition, area }) 
         )))}
       </ul>
       <footer className="Place__footer">
-        <Link to={`/basket/${area.id}/${item.id}`} className="Place__order">
-          Оформить заказ ({price})
-        </Link>
+        {isOrderPossible ? (
+          <Link to={`/basket/${area.id}/${item.id}`} className="Place__order">
+            Оформить заказ ({price})
+          </Link>
+        ) : (
+          <a
+            href="#"
+            onClick={(event) => event.preventDefault()}
+            className="Place__order"
+          >
+            Оформить заказ ({price})
+          </a>
+        )}
       </footer>
     </div>
   );
