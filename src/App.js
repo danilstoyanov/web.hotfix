@@ -180,6 +180,17 @@ const App = () => {
 						order={order}
 						orderStatuses={orderStatuses}
 						foodAreas={FOOD_AREAS}
+						setCanceledOrder={({ itemId }) => {
+							const nextStatuses = {...orderStatuses};
+
+							nextStatuses[itemId] = 'CANCELED';
+
+							// В задании говорилось про консоль, выведу на всякий случай
+							console.log(nextStatuses);
+
+							setOrderStatuses(nextStatuses);
+							localStorage.setItem('orderStatuses', JSON.stringify(nextStatuses));
+						}}
 						setFinishedOrder={({ itemId }) => {
 							const nextStatuses = {...orderStatuses};
 
