@@ -121,21 +121,22 @@ const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
         </div>
         <div className="Place__choice-item">
           <span>Назначить</span>
-          <input
-            value={time}
-            onFocus={() => {
-              setFaster(false);
-            }}
-            onChange={event => {
-              setFaster(false);
-              setTime(event.target.value);
-            }}
-            onBlur={() => {
-              if (time) {
+            <input
+              type="time"
+              value={time}
+              onFocus={() => {
                 setFaster(false);
-              }
-            }}
-          />
+              }}
+              onChange={event => {
+                setFaster(false);
+                setTime(event.target.value);
+              }}
+              onBlur={() => {
+                if (time) {
+                  setFaster(false);
+                }
+              }}
+            />
         </div>
         <div className="Place__choice-item">
           <h3>С собой</h3>
