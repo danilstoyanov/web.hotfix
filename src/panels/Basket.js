@@ -9,9 +9,20 @@ import './place.css';
 
 
 const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
-  const [ faster, setFaster ] = useState(true);
-  const [ time, setTime ] = useState('');
-  const [ selfService, setSelfService ] = useState(false);
+  const isObjectEmpty = (obj) => Object.keys(obj).length === 0
+  const cachedBasketState = JSON.parse(
+    localStorage.getItem('basketState')
+      ? localStorage.getItem('basketState')
+      : "{}"
+  )
+
+  const defaultFaster = (!isObjectEmpty(cachedBasketState) && cachedBasketState.time === '') || false;
+  const defaultTime = (!isObjectEmpty(cachedBasketState) && cachedBasketState.time) || '';
+  const defaultSelfService = (!isObjectEmpty(cachedBasketState) && cachedBasketState.selfService) || false;
+
+  const [ faster, setFaster ] = useState(defaultFaster);
+  const [ time, setTime ] = useState(defaultTime);
+  const [ selfService, setSelfService ] = useState(defaultSelfService);
   const area = foodAreas.filter(area => area.id === areaId)[0];
   const item = area.items.filter(item => item.id === itemId)[0];
 
@@ -33,6 +44,18 @@ const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
 
     return [ accounting.formatNumber(result, 0, ' '), products ];
   }, [ order, item ]);
+
+  const onEditToggled = () => {
+    localStorage.setItem('basketState', JSON.stringify({
+      faster,
+      selfService,
+      time: time || '',
+    }))
+  }
+
+  const resetBasketState = () => {
+    localStorage.removeItem('basketState')
+  }
 
   return (
     <div className="Place">
@@ -99,6 +122,7 @@ const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
         <Link
           className="Place__change-product"
           to={`/place/${areaId}/${itemId}`}
+          onClick={onEditToggled}
         >
           Изменить
         </Link>
@@ -148,7 +172,11 @@ const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
         </div>
       </div>
       <footer className="Place__footer">
-        <Link to={`/order/${area.id}/${item.id}`} className="Place__order">
+        <Link
+          onClick={resetBasketState}
+          to={`/order/${area.id}/${item.id}`}
+          className="Place__order"
+        >
           Оплатить {price}
         </Link>
       </footer>
